@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ShareBite – Community Food Sharing Network</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#f3faf6;--card:#fff;--tx:#0f2a1f;--mu:#5b7266;--em:#059669;--em2:#047857;--soft:#d1fae5;--bd:#dcebe2;--warn:#b45309;--bad:#be123c;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#08150f;--card:#0f2219;--tx:#e6f5ec;--mu:#8fb0a0;--soft:#12392a;--bd:#1d3a2c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#08150f;--card:#0f2219;--tx:#e6f5ec;--mu:#8fb0a0;--soft:#12392a;--bd:#1d3a2c;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 "Plus Jakarta Sans",system-ui,sans-serif}
+nav{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:12px 20px;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+nav b{font-size:20px;color:var(--em);margin-right:auto;cursor:pointer}
+nav button{background:none;border:0;color:var(--tx);padding:7px 12px;border-radius:99px;font:600 14px inherit;cursor:pointer}
+nav button.on,nav button:hover{background:var(--soft);color:var(--em2)}
+main{max-width:1080px;margin:0 auto;padding:22px 16px 60px}
+.hero{background:linear-gradient(135deg,#047857,#10b981);color:#fff;border-radius:28px;padding:44px 28px;margin-bottom:22px}
+.hero h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:0 0 10px;font-weight:800}.hero p{max-width:560px;opacity:.92}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:16px;box-shadow:0 2px 10px rgba(5,150,105,.07)}
+.stat b{display:block;font-size:28px;color:var(--em);font-weight:800}.stat span{color:var(--mu);font-size:13px}
+.btn{background:var(--em);color:#fff;border:0;border-radius:12px;padding:9px 16px;font:600 14px inherit;cursor:pointer}.btn:hover{background:var(--em2)}
+.btn.g{background:var(--soft);color:var(--em2)}.btn.r{background:#ffe4e6;color:var(--bad)}
+.tag{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;background:var(--soft);color:var(--em2);margin:0 4px 4px 0}
+.tag.nv{background:#ffedd5;color:var(--warn)}.tag.bad{background:#ffe4e6;color:var(--bad)}
+input,select{width:100%;padding:9px 11px;border:1px solid var(--bd);border-radius:12px;background:var(--card);color:var(--tx);font:inherit}
+label{font-size:12px;font-weight:600;color:var(--mu);display:block;margin:8px 0 3px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.row>*{flex:1;min-width:130px}
+h2{margin:26px 0 12px}.mu{color:var(--mu);font-size:13px}.score{font-size:26px;font-weight:800;color:var(--em)}
+.bar{height:8px;background:var(--soft);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--em)}
+.tbl{overflow-x:auto}table{width:100%;border-collapse:collapse}td,th{padding:8px;text-align:left;border-bottom:1px solid var(--bd);font-size:14px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#065f46;color:#fff;padding:10px 18px;border-radius:99px;display:none;z-index:9}
+.img{height:90px;border-radius:14px;background:linear-gradient(135deg,var(--soft),#a7f3d0);display:grid;place-items:center;font-size:42px;margin-bottom:10px}
+</style></head><body>
+<nav id="nav"></nav><main id="app"></main><div id="toast"></div>
+<script>
+const H=36e5,KEY="sharebite_v1";let S,U=null,page="home",F={q:"",cat:"",veg:""};
+const $=id=>document.getElementById(id);
+const t=d=>new Date(d).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+function seed(){const n=Date.now();return{nid:100,cfg:{kg:0.4,co2:2.5},
+users:[
+{id:1,name:"BMSIT Canteen",role:"donor",email:"canteen@demo.in",area:"Yelahanka",lat:13.1307,lng:77.5718,phone:"080-2200-1101"},
+{id:2,name:"Spice Route Restaurant",role:"donor",email:"restaurant@demo.in",area:"Indiranagar",lat:12.9784,lng:77.6408,phone:"080-2200-1102"},
+{id:3,name:"Baker’s Basket",role:"donor",email:"bakery@demo.in",area:"Koramangala",lat:12.9352,lng:77.6245,phone:"080-2200-1103"},
+{id:4,name:"Sunrise Boys Hostel",role:"donor",email:"hostel@demo.in",area:"Jakkur",lat:13.078,lng:77.607,phone:"080-2200-1104"},
+{id:5,name:"Hebbal Community Kitchen",role:"recipient",email:"kitchen@demo.in",area:"Hebbal",lat:13.0358,lng:77.597,phone:"080-2200-2201",need:25,diet:"any"},
+{id:6,name:"Hope NGO",role:"recipient",email:"ngo@demo.in",area:"Malleshwaram",lat:13.0035,lng:77.571,phone:"080-2200-2202",need:15,diet:"veg"},
+{id:7,name:"Platform Admin",role:"admin",email:"admin@demo.in",area:"Bengaluru",lat:12.97,lng:77.59,phone:"-"}],
+dons:[
+{id:1,donor:1,title:"Vegetarian meal packets",cat:"Meals",veg:true,qty:40,deadline:n+6*H,from:n+.5*H,to:n+4*H,addr:"BMSIT Canteen, Yelahanka",lat:13.1307,lng:77.5718,status:"active"},
+{id:2,donor:2,title:"Chicken rice meal packets",cat:"Meals",veg:false,qty:25,deadline:n+5*H,from:n+.5*H,to:n+3*H,addr:"Spice Route, Indiranagar",lat:12.9784,lng:77.6408,status:"active"},
+{id:3,donor:3,title:"Bread packets",cat:"Bakery",veg:true,qty:30,deadline:n+20*H,from:n+H,to:n+10*H,addr:"Baker’s Basket, Koramangala",lat:12.9352,lng:77.6245,status:"active"},
+{id:4,donor:4,title:"Dinner packets",cat:"Meals",veg:true,qty:20,deadline:n+2*H,from:n+.2*H,to:n+.75*H,addr:"Sunrise Hostel, Jakkur",lat:13.078,lng:77.607,status:"active"},
+{id:5,donor:3,title:"Sandwich boxes (expired)",cat:"Bakery",veg:true,qty:10,deadline:n-H,from:n-4*H,to:n-2*H,addr:"Baker’s Basket, Koramangala",lat:12.9352,lng:77.6245,status:"active"}],
+reqs:[]}}
+function load(){try{const s=localStorage.getItem(KEY);if(s)return JSON.parse(s)}catch(e){}return seed()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+S=load();
+const toast=m=>{const e=$("toast");e.textContent=m;e.style.display="block";setTimeout(()=>e.style.display="none",2600)};
+const user=id=>S.users.find(u=>u.id==id),don=id=>S.dons.find(d=>d.id==id);
+const act=r=>["pending","approved","completed"].includes(r.status);
+const avail=d=>d.qty-S.reqs.filter(r=>r.don==d.id&&act(r)).reduce((a,r)=>a+r.qty,0);
+const dist=(a,b,c,e)=>{const R=6371,f=x=>x*Math.PI/180,x=f(c-a),y=f(e-b);const h=Math.sin(x/2)**2+Math.cos(f(a))*Math.cos(f(c))*Math.sin(y/2)**2;return 2*R*Math.asin(Math.sqrt(h))};
+function match(r,d){const now=Date.now(),av=avail(d),km=dist(r.lat,r.lng,d.lat,d.lng),arrive=now+km/20*H*1+0;
+ const fail=x=>({ok:false,why:x});
+ if(d.status!=="active")return fail("Cancelled");if(d.deadline<=now)return fail("Safe-consumption deadline passed");
+ if(av<=0)return fail("No quantity left");if(r.diet==="veg"&&!d.veg)return fail("Diet mismatch (veg only)");
+ if(km>20)return fail("Beyond 20 km");const pick=Math.max(arrive,d.from);
+ if(pick>d.to)return fail("Cannot reach within pickup window");if(pick+.33*H>d.deadline)return fail("Too close to deadline");
+ const s={dist:30*(1-km/20),qty:25*Math.min(1,av/r.need),cat:r.diet==="veg"&&d.veg?15:12,time:15*Math.min(1,(d.to-pick)/(2*H)),dl:15*Math.min(1,(d.deadline-pick)/(3*H))};
+ const score=Math.round(Object.values(s).reduce((a,b)=>a+b,0));
+ return{ok:true,score,km,av,pick,rq:Math.min(av,r.need),reasons:[`${km.toFixed(1)} km away (${Math.round(s.dist)}/30)`,`${av} packets available vs need ${r.need} (${Math.round(s.qty)}/25)`,`${d.veg?"Vegetarian":"Non-veg"} fits preference (${s.cat}/15)`,`Pickup ${t(pick)}–${t(d.to)} reachable (${Math.round(s.time)}/15)`,`${((d.deadline-pick)/H).toFixed(1)} h of safe time left (${Math.round(s.dl)}/15)`]}}
+const impact=()=>{const done=S.reqs.filter(r=>r.status==="completed"),p=done.reduce((a,r)=>a+r.qty,0);return{p,kg:(p*S.cfg.kg).toFixed(1),co2:(p*S.cfg.kg*S.cfg.co2).toFixed(1),n:done.length,
+ dn:S.dons.length,pk:S.dons.reduce((a,d)=>a+d.qty,0),pend:S.reqs.filter(r=>r.status==="pending").length,ad:S.users.filter(u=>u.role==="donor").length,ar:S.users.filter(u=>u.role==="recipient").length}};
+function go(p){page=p;save();draw()}
+function draw(){const tabs=[["home","Home"],["list","Food listings"]];
+ if(U?.role==="recipient")tabs.push(["match","Smart matches"],["mine","My requests"]);
+ if(U?.role==="donor")tabs.push(["dash","Donor dashboard"],["add","Add donation"]);
+ if(U?.role==="admin")tabs.push(["admin","Admin"]);
+ tabs.push(U?["out","Logout ("+U.name.split(" ")[0]+")"]:["login","Login"]);
+ $("nav").innerHTML="<b onclick=\"go('home')\">🌿 ShareBite</b>"+tabs.map(([k,v])=>`<button class="${page===k?"on":""}" onclick="go('${k}')">${v}</button>`).join("");
+ if(page==="out"){U=null;page="home";toast("Logged out")}
+ $("app").innerHTML=({home,list,match:matches,mine,dash,add,admin,login})[page]();window.scrollTo(0,0)}
+function stats(){const i=impact();return `<div class="grid">${[[i.dn,"Donations posted"],[i.p,"Packets shared"],[i.n,"Completed pickups"],[i.ad,"Active donors"],[i.ar,"Active recipients"],[i.kg+" kg","Food waste prevented"]].map(([a,b])=>`<div class="card stat"><b>${a}</b><span>${b}</span></div>`).join("")}</div>`}
+function home(){return `<div class="hero"><h1>Surplus food in. Hunger out.</h1><p>ShareBite connects canteens, restaurants, bakeries and hostels with NGOs, shelters and community kitchens across Bengaluru. Every match is rule-based and fully explainable.</p><button class="btn" style="background:#fff;color:#047857" onclick="go('${U?"list":"login"}')">${U?"Browse food":"Try the demo"}</button></div>
+<h2 style="margin-top:0">Impact so far</h2>${stats()}<p class="mu">Estimate: packets × ${S.cfg.kg} kg per packet = food saved; × ${S.cfg.co2} kg CO₂e per kg avoided. Only completed pickups count. Admin can change both values.</p>
+<h2>How it works</h2><div class="grid">${[["🍱","Donors post","Add surplus with quantity, deadline and pickup window."],["🎯","We match","Score 0–100 from distance, quantity, diet, timing and safety deadline."],["🤝","Pickup","Request, approve, collect, confirm. No overbooking."]].map(a=>`<div class="card"><div class="img">${a[0]}</div><b>${a[1]}</b><p class="mu">${a[2]}</p></div>`).join("")}</div>`}
+function login(){return `<div class="card" style="max-width:420px;margin:auto"><h2 style="margin-top:0">Login</h2><label>Account</label><select id="lu">${S.users.map(u=>`<option value="${u.email}">${u.name} (${u.role})</option>`).join("")}</select><label>Password</label><input id="lp" type="password" value="demo123"><p><button class="btn" onclick="doLogin()">Login</button></p>
+<p class="mu"><b>Sample accounts</b> (all use password <code>demo123</code>): canteen@demo.in, restaurant@demo.in, bakery@demo.in, hostel@demo.in (donors); kitchen@demo.in, ngo@demo.in (recipients); admin@demo.in (admin).</p></div>`}
+function doLogin(){const u=S.users.find(x=>x.email===$("lu").value);if($("lp").value!=="demo123")return toast("Wrong password");U=u;toast("Welcome, "+u.name);go({donor:"dash",recipient:"match",admin:"admin"}[u.role])}
+function dcard(d,m){const o=user(d.donor),av=avail(d),exp=d.deadline<Date.now();
+ return `<div class="card"><div class="img">${d.cat==="Bakery"?"🍞":"🍛"}</div><b>${d.title}</b>
+ <div><span class="tag ${d.veg?"":"nv"}">${d.veg?"Veg":"Non-veg"}</span><span class="tag">${d.cat}</span>${exp?'<span class="tag bad">Expired</span>':""}${d.status==="cancelled"?'<span class="tag bad">Cancelled</span>':""}</div>
+ <div class="mu">${o.name} · ${d.addr}<br>Available <b>${av}</b>/${d.qty} packets · Pickup ${t(d.from)}–${t(d.to)} · Eat before ${t(d.deadline)}${m?.km!=null?`<br>📍 ${m.km.toFixed(1)} km`:""}</div>
+ ${m?.ok?`<div class="score">${m.score}% match</div><div class="bar"><i style="width:${m.score}%"></i></div><ul class="mu" style="padding-left:18px">${m.reasons.map(r=>`<li>${r}</li>`).join("")}</ul>`:""}
+ ${U?.role==="recipient"&&av>0&&!exp&&d.status==="active"?`<div class="row"><div><label>Packets</label><input id="q${d.id}" type="number" min="1" max="${av}" value="${m?.ok?m.rq:Math.min(av,U.need)}"></div><div><label>Pickup time</label><input id="p${d.id}" type="time" value="${new Date(m?.ok?m.pick:d.from).toTimeString().slice(0,5)}"></div></div><p><button class="btn" onclick="request(${d.id})">Request pickup</button></p>`:""}</div>`}
+function list(){let r=U?.role==="recipient"?U:null;let ds=S.dons.filter(d=>(!F.q||(d.title+user(d.donor).name+d.addr).toLowerCase().includes(F.q.toLowerCase()))&&(!F.cat||d.cat===F.cat)&&(!F.veg||String(d.veg)===F.veg));
+ if(r)ds=ds.map(d=>[d,dist(r.lat,r.lng,d.lat,d.lng)]).sort((a,b)=>a[1]-b[1]).map(a=>d=a[0]);
+ return `<h2 style="margin-top:0">Food listings</h2><div class="row card"><div><label>Search</label><input value="${F.q}" onchange="F.q=this.value;draw()" placeholder="Bread, Yelahanka…"></div><div><label>Category</label><select onchange="F.cat=this.value;draw()"><option value="">All</option>${["Meals","Bakery"].map(c=>`<option ${F.cat===c?"selected":""}>${c}</option>`).join("")}</select></div><div><label>Diet</label><select onchange="F.veg=this.value;draw()"><option value="">All</option><option value="true" ${F.veg==="true"?"selected":""}>Veg</option><option value="false" ${F.veg==="false"?"selected":""}>Non-veg</option></select></div></div><br>
+ ${ds.length?`<div class="grid">${ds.map(d=>dcard(d,r?{km:dist(r.lat,r.lng,d.lat,d.lng)}:null)).join("")}</div>`:'<div class="card mu">No donations match these filters.</div>'}`}
+function matches(){const all=S.dons.map(d=>[d,match(U,d)]),ok=all.filter(a=>a[1].ok).sort((a,b)=>b[1].score-a[1].score);
+ return `<h2 style="margin-top:0">Smart recommendations</h2><p class="mu">Rule-based score out of 100 (distance 30, quantity 25, diet 15, pickup time 15, safety deadline 15). No machine learning. Need: ${U.need} packets, ${U.diet==="veg"?"veg only":"any diet"}.</p>
+ <div class="grid">${ok.map(([d,m])=>dcard(d,m)).join("")||'<div class="card mu">No suitable donations right now.</div>'}</div><h2>Excluded (and why)</h2><div class="card tbl"><table>${all.filter(a=>!a[1].ok).map(([d,m])=>`<tr><td>${d.title}</td><td>${user(d.donor).name}</td><td><span class="tag bad">${m.why}</span></td></tr>`).join("")}</table></div>`}
+function request(id){const d=don(id),q=+$("q"+id).value,[h,m]=$("p"+id).value.split(":").map(Number);
+ if(d.deadline<=Date.now()||d.status!=="active")return toast("Donation no longer available");
+ if(!Number.isInteger(q)||q<1)return toast("Enter a valid quantity");if(q>avail(d))return toast("Only "+avail(d)+" packets left");
+ const pt=new Date();pt.setHours(h,m,0,0);if(pt<d.from||pt>d.to)return toast("Time must be within "+t(d.from)+"–"+t(d.to));if(pt>=d.deadline)return toast("Pickup is after safe deadline");
+ S.reqs.push({id:S.nid++,don:id,rec:U.id,qty:q,time:+pt,status:"pending",at:Date.now()});save();toast("Request sent to donor");go("mine")}
+function setReq(id,st){const r=S.reqs.find(x=>x.id==id),d=don(r.don);
+ if(U.role==="donor"&&d.donor!==U.id||U.role==="recipient"&&r.rec!==U.id)return toast("Not permitted");
+ const ok={approved:["pending"],rejected:["pending"],completed:["approved"],cancelled:["pending","approved"]};if(!ok[st].includes(r.status))return toast("Invalid state change");
+ r.status=st;save();toast("Request "+st);draw()}
+function rcard(r,own){const d=don(r.don),o=user(d.donor),rc=user(r.rec),ap=r.status==="approved"||r.status==="completed";
+ return `<div class="card"><b>#${r.id} · ${d.title}</b> <span class="tag ${r.status==="rejected"||r.status==="cancelled"?"bad":""}">${r.status}</span><div class="mu">${own?"From "+o.name:"By "+rc.name} · ${r.qty} packets · ${t(r.time)}${ap?`<br>📍 ${d.addr}<br>☎ ${own?o.phone:rc.phone}`:""}<br>Donation ID ${d.id}</div><p>
+ ${own?(["pending","approved"].includes(r.status)?`<button class="btn r" onclick="setReq(${r.id},'cancelled')">Cancel</button> `:""):`${r.status==="pending"?`<button class="btn" onclick="setReq(${r.id},'approved')">Approve</button> <button class="btn r" onclick="setReq(${r.id},'rejected')">Reject</button> `:""}${r.status==="approved"?`<button class="btn" onclick="setReq(${r.id},'completed')">Confirm pickup done</button>`:""}`}</p></div>`}
+function mine(){const rs=S.reqs.filter(r=>r.rec===U.id).reverse();return `<h2 style="margin-top:0">My requests</h2><div class="grid">${rs.map(r=>rcard(r,true)).join("")||'<div class="card mu">No requests yet. Check Smart matches.</div>'}</div>`}
+function dash(){const mine=S.dons.filter(d=>d.donor===U.id),ids=mine.map(d=>d.id),rs=S.reqs.filter(r=>ids.includes(r.don)).reverse();
+ return `<h2 style="margin-top:0">Donor dashboard</h2><h3>My donations</h3><div class="grid">${mine.map(d=>dcard(d)+"").join("")||'<div class="card mu">Nothing posted yet.</div>'}</div>
+ <div class="grid" style="margin-top:8px">${mine.filter(d=>d.status==="active").map(d=>`<button class="btn r" onclick="cancelDon(${d.id})">Cancel “${d.title}”</button>`).join("")}</div>
+ <h3>Pickup requests</h3><div class="grid">${rs.map(r=>rcard(r,false)).join("")||'<div class="card mu">No requests yet.</div>'}</div>`}
+function cancelDon(id){const d=don(id);if(d.donor!==U.id)return toast("Not permitted");d.status="cancelled";S.reqs.filter(r=>r.don===id&&["pending","approved"].includes(r.status)).forEach(r=>r.status="cancelled");save();toast("Donation cancelled");draw()}
+function add(){const L=h=>new Date(Date.now()+h*H-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,16);
+ return `<div class="card" style="max-width:640px;margin:auto"><h2 style="margin-top:0">Add donation</h2><div class="row"><div><label>Title</label><input id="a1" placeholder="Veg biryani packets"></div><div><label>Category</label><select id="a2"><option>Meals</option><option>Bakery</option></select></div></div>
+ <div class="row"><div><label>Type</label><select id="a3"><option value="1">Vegetarian</option><option value="0">Non-vegetarian</option></select></div><div><label>Quantity (packets)</label><input id="a4" type="number" min="1" value="10"></div></div>
+ <div class="row"><div><label>Pickup from</label><input id="a5" type="datetime-local" value="${L(.5)}"></div><div><label>Pickup until</label><input id="a6" type="datetime-local" value="${L(3)}"></div><div><label>Safe to eat until</label><input id="a7" type="datetime-local" value="${L(5)}"></div></div>
+ <div class="row"><div><label>Address</label><input id="a8" value="${U.name}, ${U.area}"></div><div><label>Latitude</label><input id="a9" value="${U.lat}"></div><div><label>Longitude</label><input id="a10" value="${U.lng}"></div></div>
+ <p><button class="btn" onclick="addDon()">Post donation</button></p></div>`}
+function addDon(){const v=i=>$("a"+i).value,f=new Date(v(5)),to=new Date(v(6)),dl=new Date(v(7)),q=+v(4),la=+v(9),ln=+v(10);
+ if(!v(1).trim())return toast("Title required");if(!(q>=1))return toast("Quantity must be 1 or more");if(isNaN(f)||isNaN(to)||isNaN(dl))return toast("Fill all times");
+ if(to<=f)return toast("Pickup end must be after start");if(dl<=to)return toast("Safe deadline must be after pickup window");if(isNaN(la)||isNaN(ln))return toast("Valid coordinates required");
+ S.dons.push({id:S.nid++,donor:U.id,title:v(1).trim(),cat:v(2),veg:v(3)==="1",qty:q,from:+f,to:+to,deadline:+dl,addr:v(8),lat:la,lng:ln,status:"active"});save();toast("Donation posted");go("dash")}
+function admin(){const i=impact(),by=S.users.filter(u=>u.role==="donor").map(u=>[u.name.split(" ")[0],S.dons.filter(d=>d.donor===u.id).reduce((a,d)=>a+d.qty,0)]),mx=Math.max(...by.map(a=>a[1]),1);
+ return `<h2 style="margin-top:0">Admin dashboard</h2>${stats()}<div class="grid" style="margin-top:14px"><div class="card stat"><b>${i.pend}</b><span>Pending requests</span></div><div class="card stat"><b>${i.co2} kg</b><span>CO₂e avoided (estimate)</span></div></div>
+ <h2>Packets offered per donor</h2><div class="card"><svg viewBox="0 0 400 150" width="100%">${by.map((a,k)=>`<rect x="${20+k*95}" y="${120-a[1]/mx*100}" width="60" height="${a[1]/mx*100}" rx="8" fill="#10b981"/><text x="${50+k*95}" y="${112-a[1]/mx*100}" text-anchor="middle" font-size="12" fill="currentColor">${a[1]}</text><text x="${50+k*95}" y="140" text-anchor="middle" font-size="11" fill="currentColor">${a[0]}</text>`).join("")}</svg></div>
+ <h2>Impact assumptions</h2><div class="card row"><div><label>kg of food per packet</label><input id="c1" type="number" step="0.1" value="${S.cfg.kg}"></div><div><label>kg CO₂e per kg food</label><input id="c2" type="number" step="0.1" value="${S.cfg.co2}"></div><button class="btn" onclick="S.cfg={kg:+$('c1').value||0.4,co2:+$('c2').value||2.5};save();toast('Saved');draw()">Update</button></div>
+ <h2>Users</h2><div class="card tbl"><table><tr><th>Name</th><th>Role</th><th>Area</th></tr>${S.users.map(u=>`<tr><td>${u.name}</td><td>${u.role}</td><td>${u.area}</td></tr>`).join("")}</table></div>
+ <p><button class="btn r" onclick="S=seed();save();toast('Demo data reset');draw()">Reset demo data</button></p>`}
+draw();
+</script></body></html>
